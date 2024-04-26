@@ -4,22 +4,30 @@
 <h1>War Thunder BR Calculator</h1>
 
 <table>
-    @foreach (var plane in PlaneDictionary)
-    {
-        <tr>
-            <td>
-                <input value="@PlaneDictionary[plane.Key]" @onchange="@((ChangeEventArgs e) => {PlaneDictionary[plane.Key] = SanitizeNumber(Convert.ToDecimal(e.Value!)); CalculateBR();})" readonly/>
-                <button class="raiserating" @onclick="()=>RaiseRating(plane.Key, plane.Value)">+</button>
-                <button class="lowerrating" @onclick="()=>LowerRating(plane.Key, plane.Value)">-</button>
-                <button class="removeplane" @onclick="()=>RemoveSpecifiedPlane(plane.Key)">X</button>
-            </td>
-        </tr>
-    }
-    <button class="addplane" @onclick=AddPlane>Add Plane</button>
-    <p role="status" class="currentbr">Current Battle Rating: @BattleRating</p>
-    <p role="status" class="rawbr">Current Raw Battle Rating: @RawBattleRating</p>
+    <tr>
+        <td class="enellerandentd">
+            <table>
+                @foreach (var plane in PlaneDictionary)
+                {
+                    <tr>
+                        <td class="td-left">
+                            <input value="@PlaneDictionary[plane.Key]" @onchange="@((ChangeEventArgs e) => {PlaneDictionary[plane.Key] = SanitizeNumber(Convert.ToDecimal(e.Value!)); CalculateBR();})" readonly />
+                            <button class="raiserating" @onclick="()=>RaiseRating(plane.Key, plane.Value)">+</button>
+                            <button class="lowerrating" @onclick="()=>LowerRating(plane.Key, plane.Value)">-</button>
+                            <button class="removeplane" @onclick="()=>RemoveSpecifiedPlane(plane.Key)">X</button>
+                        </td>
+                    </tr>
+                }
 
+            </table>
+        </td>
+        <td class="td-right">
+            <p role="status" class="currentbrtext">Current Battle Rating:<br /><span class="currentbrvalue"> @BattleRating</span></p>
+            <p role="status" class="rawbrtext">Current Raw Battle Rating:<br /> <span class="rawbrvalue"> @RawBattleRating</span></p>
+            <button class="addplane" @onclick=AddPlane>Add Plane</button>
+        </td>
 
+    </tr>
 </table>
 
 @code {
@@ -70,7 +78,7 @@
 
     private void CalculateBR()
     {
-        Dictionary<int,decimal> tempDictionary = PlaneDictionary.ToDictionary(e => e.Key, e => e.Value);
+        Dictionary<int, decimal> tempDictionary = PlaneDictionary.ToDictionary(e => e.Key, e => e.Value);
 
         decimal planeA;
         decimal planeB;
@@ -79,7 +87,7 @@
         bool doubleDipRule = false;
 
 
-        maxKey = tempDictionary.Aggregate((x,y)=>x.Value > y.Value ? x : y).Key;
+        maxKey = tempDictionary.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
         planeA = tempDictionary[maxKey];
         if (tempDictionary.Count < 3)
         {
@@ -94,10 +102,10 @@
             doubleDipRule = true;
         }
 
-        maxKey = tempDictionary.Aggregate((x,y)=>x.Value > y.Value ? x : y).Key;
+        maxKey = tempDictionary.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
         planeB = tempDictionary[maxKey];
         tempDictionary.Remove(maxKey);
-        maxKey = tempDictionary.Aggregate((x,y)=>x.Value > y.Value ? x : y).Key;
+        maxKey = tempDictionary.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
         planeC = tempDictionary[maxKey];
         tempDictionary.Remove(maxKey);
 
@@ -118,13 +126,13 @@
         else if (ACDelta >= 0.6M && ACDelta <= 2.0M) planeCDerived = planeA - 0.6M;
         else planeCDerived = planeA;
 
-        RawBattleRating = ( planeA / 2 ) + ( planeBDerived / 4 ) + ( planeCDerived / 4 );
+        RawBattleRating = (planeA / 2) + (planeBDerived / 4) + (planeCDerived / 4);
 
         if (doubleDipRule) BattleRating = planeA;
         else if (RawBattleRating < StepDown(planeA)) BattleRating = StepDown(planeA);
         else
         {
-            
+
             decimal upDelta = planeA - RawBattleRating;
             decimal downDelta = RawBattleRating - StepDown(planeA);
 
@@ -146,8 +154,8 @@
 
         throw new Exception("Unexpected result");
     }
-    
-     
+
+
     private static decimal StepDown(decimal input)
     {
         if (input < 1.0M) return 1M;
@@ -163,5 +171,5 @@
 
         throw new Exception("Unexpected result");
     }
-    
+
 }
