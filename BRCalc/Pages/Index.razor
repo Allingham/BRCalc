@@ -87,7 +87,16 @@
         decimal lowerSum = 0;
         foreach (var plane in tempDictionary)
         {
-            lowerSum += plane.Value;
+            if (maxValue - plane.Value > 1.1M)
+            {
+                decimal steppedDownValue = maxValue;
+                for (int i = 0; i < 4; i++)
+                {
+                    steppedDownValue = StepDown(steppedDownValue);
+                }
+                lowerSum += steppedDownValue;
+            }
+            else { lowerSum += plane.Value; }
         }
         decimal lowerAverage = lowerSum / tempDictionary.Count;
         sum = lowerAverage + maxValue;
