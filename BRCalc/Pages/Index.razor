@@ -91,14 +91,19 @@
 
         maxKey = tempDictionary.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
         planeA = tempDictionary[maxKey];
-        if (tempDictionary.Count < 3)
+        if (tempDictionary.Count == 1)
         {
-            BattleRating = planeA;
+            BattleRating = StepDown(planeA);
             return;
         }
+        if (tempDictionary.Count == 2)
+        {
+            BattleRating = StepDown(planeA);
+            if (doubleDipRule) BattleRating = planeA;
+            return;
+        }
+
         tempDictionary.Remove(maxKey);
-
-
         if (tempDictionary.ContainsValue(planeA))
         {
             doubleDipRule = true;
@@ -106,6 +111,8 @@
 
         maxKey = tempDictionary.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
         planeB = tempDictionary[maxKey];
+
+
         tempDictionary.Remove(maxKey);
         maxKey = tempDictionary.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
         planeC = tempDictionary[maxKey];
