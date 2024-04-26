@@ -101,16 +101,26 @@
         if (planeA - planeB > 2M) planeB = planeA - 2.0M;
         if (planeA - planeC > 2M) planeC = planeA - 2.0M;
 
-        decimal planeAFraction = planeA / 2;
-        decimal planeBFraction = planeB / 4;
-        decimal planeCFraction = planeC / 4;
+        decimal planeBDerived;
+        decimal planeCDerived;
+        decimal ABDelta = planeA - planeB;
+        decimal ACDelta = planeA - planeC;
 
-        RawBattleRating = planeAFraction + planeBFraction + planeCFraction;
+        if (ABDelta < 0.6M) planeBDerived = planeB;
+        else if (ABDelta >= 0.6M && ABDelta <= 2.0M) planeBDerived = planeA - 0.6M;
+        else planeBDerived = planeA;
+
+        if (ACDelta < 0.6M) planeCDerived = planeC;
+        else if (ACDelta >= 0.6M && ACDelta <= 2.0M) planeCDerived = planeA - 0.6M;
+        else planeCDerived = planeA;
+
+        RawBattleRating = ( planeA / 2 ) + ( planeBDerived / 4 ) + ( planeCDerived / 4 );
 
         if (doubleDipRule) BattleRating = planeA;
         else if (RawBattleRating < StepDown(planeA)) BattleRating = StepDown(planeA);
         else
         {
+            
             decimal upDelta = planeA - RawBattleRating;
             decimal downDelta = RawBattleRating - StepDown(planeA);
 
