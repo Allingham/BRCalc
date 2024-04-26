@@ -1,0 +1,110 @@
+﻿@page "/"
+
+<PageTitle>BR Calc</PageTitle>
+<h1>War Thunder BR Calculator</h1>
+
+<table>
+    @foreach (var plane in PlaneDictionary)
+    {
+        <tr>
+            <td>
+                <input value="@PlaneDictionary[plane.Key]" @onchange="@((ChangeEventArgs e) => {PlaneDictionary[plane.Key] = (double)e.Value!; CalculateBR();})" />
+                <button @onclick="()=>RaiseRating(plane.Key, plane.Value)">+</button>
+                <button @onclick="()=>LowerRating(plane.Key, plane.Value)">-</button>
+                <button @onclick="()=>RemoveSpecifiedPlane(plane.Key)">X</button>
+                @plane
+            </td>
+        </tr>
+    }
+    <button @onclick=AddPlane>Add Plane</button>
+
+</table>
+
+
+<p role="status">Current Battle Rating: @BattleRating</p>
+<p role="status">Current RawBattle Rating: @RawBattleRating</p>
+<p display="none" role="status">Current plane index: @planeIndex</p>
+
+@code {
+    public static int planeIndex = 0;
+    public double BattleRating = 0;
+    public double RawBattleRating = 0;
+    public double debug = 0.0;
+
+    public Dictionary<int, double> PlaneDictionary = new()
+    {
+        {planeIndex++ , 3.0},
+        {planeIndex++ , 3.0},
+        {planeIndex++ , 3.0},
+    };
+
+    private void LowerRating(int key, double value)
+    {
+        double newValue = SanitizeNumber(value - 0.41);
+        PlaneDictionary[key] = newValue;
+        CalculateBR();
+    }
+
+    private void RaiseRating(int key, double value)
+    {
+        double newValue = SanitizeNumber(value + 0.29);
+        PlaneDictionary[key] = newValue;
+        CalculateBR();
+    }
+
+    private void AddPlane()
+    {
+        PlaneDictionary.Add(planeIndex++, 1.0);
+        CalculateBR();
+    }
+
+    private void RemoveSpecifiedPlane(int key)
+    {
+        PlaneDictionary.Remove(key);
+        CalculateBR();
+    }
+
+    private void CalculateBR()
+    {
+        Dictionary<int,double> tempDictionary = PlaneDictionary.ToDictionary(e => e.Key, e => e.Value);
+
+        int maxKey = tempDictionary.Aggregate((x,y)=>x.Value > y.Value ? x : y).Key;
+        double maxValue = tempDictionary[maxKey];
+        tempDictionary.Remove(maxKey);
+
+
+        if (tempDictionary.ContainsValue(maxValue))
+        {
+            BattleRating = maxValue;
+            RawBattleRating = maxValue;
+            return;   
+        }
+
+        double sum = 0;
+        double lowerSum = 0;
+        foreach (var plane in tempDictionary)
+        {
+            lowerSum += plane.Value;
+        }
+        double lowerAverage = lowerSum / tempDictionary.Count;
+        sum = lowerAverage + maxValue;
+
+        RawBattleRating = sum / 2;
+        BattleRating = SanitizeNumber(RawBattleRating);
+
+    }
+
+    private double SanitizeNumber(double input)
+    {
+        if (input < 1.0) return 1.0000;
+        double inputFloor = Math.Floor(input);
+        double inputDecimal = input % inputFloor;
+        double SanitizedInput;
+        if (inputDecimal <= 0) return inputFloor;
+        if (inputDecimal <= 0.3) { SanitizedInput = inputFloor + 0.3; return SanitizedInput; }
+        if (inputDecimal <= 0.7) { SanitizedInput = inputFloor + 0.7; return SanitizedInput; }
+        if (inputDecimal <= 1.0) { SanitizedInput = inputFloor + 1.0; return SanitizedInput; }
+
+        throw new Exception("Unexpected result");
+    }
+}

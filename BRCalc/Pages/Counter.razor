@@ -1,0 +1,87 @@
+﻿@page "/counter"
+
+<PageTitle>BR Calc</PageTitle>
+<h1>War Thunder BR Calculator</h1>
+
+<table>
+        @foreach (var plane in PlaneDictionary)
+        {
+    <tr>
+            <td>
+                <input @bind-value=PlaneDictionary[plane.Key]>
+                <button @onclick="()=>RaiseRating(plane.Key, plane.Value)">+</button>
+                <button @onclick="()=>LowerRating(plane.Key, plane.Value)">-</button>
+                <button @onclick="()=>RemoveSpecifiedPlane(plane.Key)">X</button>
+                @plane
+            </td>
+    </tr>
+        }
+        <button @onclick=AddPlane>Add Plane</button>
+    
+</table>
+
+
+<p role="status">Current Battle Rating: @BattleRating</p>
+<p role="status">Current plane index: @planeIndex</p>
+
+@code {
+    public static int planeIndex = 0;
+    public double BattleRating = 0;
+    public double debug = 0.0;
+
+    public Dictionary<int,double> PlaneDictionary = new()
+    {
+        {planeIndex++ , 3.0},
+        {planeIndex++ , 3.0},
+        {planeIndex++ , 3.0},
+    };
+
+    private void LowerRating(int key,double value)
+    {
+        double newValue = SanitizeNumber(value - 0.41);
+        PlaneDictionary[key] = newValue;
+    }
+
+    private void RaiseRating(int key,double value)
+    {
+        //if (value % Math.Floor(value) == 0.3) SanitizeNumber(value + 0.39);
+        double newValue = SanitizeNumber(value + 0.29);
+        PlaneDictionary[key] = newValue;
+
+    }
+
+    private void AddPlane()
+    {
+        PlaneDictionary.Add(planeIndex++,1.0);
+    }
+
+    private void RemoveSpecifiedPlane(int key)
+    {
+        PlaneDictionary.Remove(key);
+    }
+
+    private void CalculateBR()
+    {
+
+        double sum = 0.0;
+        foreach (var plane in PlaneDictionary)
+        {
+            sum += plane.Value;
+        }
+        BattleRating = sum / PlaneDictionary.Count;
+    }
+
+    private double SanitizeNumber(double input)
+    {
+        if (input < 1.0) return 1.0000;
+        double inputFloor = Math.Floor(input);
+        double inputDecimal = input % inputFloor;
+        double SanitizedInput;
+        if (inputDecimal <= 0) return inputFloor;
+        if (inputDecimal <= 0.3) { SanitizedInput = inputFloor + 0.3; return SanitizedInput; }
+        if (inputDecimal <= 0.7) { SanitizedInput = inputFloor + 0.7; return SanitizedInput; }
+        if (inputDecimal <= 1.0) { SanitizedInput = inputFloor + 1.0; return SanitizedInput; }
+
+        throw new Exception("Unexpected result");
+    }
+}
