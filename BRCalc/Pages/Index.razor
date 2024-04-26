@@ -37,6 +37,11 @@
         {planeIndex++ , 3.0M},
     };
 
+    protected override void OnInitialized()
+    {
+        CalculateBR();
+    }
+
     private void LowerRating(int key, decimal value)
     {
         decimal newValue = SanitizeNumber(value - 0.41M);
