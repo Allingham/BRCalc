@@ -131,11 +131,11 @@
         decimal ACDelta = planeA - planeC;
 
         if (ABDelta < 0.6M) planeBDerived = planeB;
-        else if (ABDelta >= 0.6M && ABDelta <= 2.0M) planeBDerived = planeA - 0.6M;
+        else if (ABDelta >= 0.6M && ABDelta < 2.0M) planeBDerived = planeA - 0.6M;
         else planeBDerived = planeA;
 
         if (ACDelta < 0.6M) planeCDerived = planeC;
-        else if (ACDelta >= 0.6M && ACDelta <= 2.0M) planeCDerived = planeA - 0.6M;
+        else if (ACDelta >= 0.6M && ACDelta < 2.0M) planeCDerived = planeA - 0.6M;
         else planeCDerived = planeA;
 
         debug = $"{ABDelta} {ACDelta} derivedB: {planeBDerived} ;derivedC: {planeCDerived}";
