@@ -29,13 +29,13 @@
 
     </tr>
 </table>
+<p>@debug</p>
 
 @code {
     public static int planeIndex = 0;
     public decimal BattleRating = 0;
     public decimal RawBattleRating = 0;
-    public decimal debugNum = 0.0M;
-    public decimal debugNum2 = 0.0M;
+    string debug;
 
     public Dictionary<int, decimal> PlaneDictionary = new()
     {
@@ -101,8 +101,8 @@
             if (doubleDipRule) BattleRating = planeA;
             return;
         }
-
         tempDictionary.Remove(maxKey);
+
         if (tempDictionary.ContainsValue(planeA))
         {
             doubleDipRule = true;
@@ -117,10 +117,6 @@
         planeC = tempDictionary[maxKey];
         tempDictionary.Remove(maxKey);
 
-
-        if (planeA - planeB > 2M) planeB = planeA - 2.0M;
-        if (planeA - planeC > 2M) planeC = planeA - 2.0M;
-
         decimal planeBDerived;
         decimal planeCDerived;
         decimal ABDelta = planeA - planeB;
@@ -133,6 +129,8 @@
         if (ACDelta < 0.6M) planeCDerived = planeC;
         else if (ACDelta >= 0.6M && ACDelta <= 2.0M) planeCDerived = planeA - 0.6M;
         else planeCDerived = planeA;
+
+        debug = $"{ABDelta} {ACDelta} derivedB: {planeBDerived} ;derivedC: {planeCDerived}";
 
         RawBattleRating = (planeA / 2) + (planeBDerived / 4) + (planeCDerived / 4);
 
