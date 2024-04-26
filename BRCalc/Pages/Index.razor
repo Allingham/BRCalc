@@ -8,7 +8,7 @@
     {
         <tr>
             <td>
-                <input value="@PlaneDictionary[plane.Key]" @onchange="@((ChangeEventArgs e) => {PlaneDictionary[plane.Key] = SanitizeNumber(Convert.ToDecimal(e.Value!)); CalculateBR();})" />
+                <input value="@PlaneDictionary[plane.Key]" @onchange="@((ChangeEventArgs e) => {PlaneDictionary[plane.Key] = SanitizeNumber(Convert.ToDecimal(e.Value!)); CalculateBR();})" readonly/>
                 <button class="raiserating" @onclick="()=>RaiseRating(plane.Key, plane.Value)">+</button>
                 <button class="lowerrating" @onclick="()=>LowerRating(plane.Key, plane.Value)">-</button>
                 <button class="removeplane" @onclick="()=>RemoveSpecifiedPlane(plane.Key)">X</button>
