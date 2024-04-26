@@ -99,6 +99,7 @@
         if (tempDictionary.Count == 2)
         {
             BattleRating = StepDown(planeA);
+
             specialRule = true;
         }
         tempDictionary.Remove(maxKey);
@@ -107,7 +108,13 @@
             doubleDipRule = true;
             BattleRating = planeA;
         }
-        if (specialRule) return;
+        if (specialRule)
+        {
+            maxKey = tempDictionary.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            planeB = tempDictionary[maxKey];
+            if (planeA - planeB > 2.0M) BattleRating = planeA;
+            return;
+        };
 
         maxKey = tempDictionary.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
         planeB = tempDictionary[maxKey];
