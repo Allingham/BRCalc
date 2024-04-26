@@ -16,12 +16,11 @@
         </tr>
     }
     <button class="addplane" @onclick=AddPlane>Add Plane</button>
+    <p role="status" class="currentbr">Current Battle Rating: @BattleRating</p>
+    <p role="status" class="rawbr">Current Raw Battle Rating: @RawBattleRating</p>
+
 
 </table>
-
-
-<p role="status">Current Battle Rating: @BattleRating</p>
-<p role="status">Current Raw Battle Rating: @RawBattleRating</p>
 
 @code {
     public static int planeIndex = 0;
