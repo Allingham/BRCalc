@@ -77,7 +77,13 @@
 
         maxKey = tempDictionary.Aggregate((x,y)=>x.Value > y.Value ? x : y).Key;
         planeA = tempDictionary[maxKey];
+        if (tempDictionary.Count < 3)
+        {
+            BattleRating = planeA;
+            return;
+        }
         tempDictionary.Remove(maxKey);
+
 
         if (tempDictionary.ContainsValue(planeA))
         {
