@@ -4,10 +4,6 @@
 <h1>War Thunder BR Calculator</h1>
 
 <table>
-
-</table>
-
-<table>
     @foreach (var plane in PlaneDictionary)
     {
         <tr>
@@ -71,45 +67,37 @@
     {
         Dictionary<int,decimal> tempDictionary = PlaneDictionary.ToDictionary(e => e.Key, e => e.Value);
 
-        int maxKey = tempDictionary.Aggregate((x,y)=>x.Value > y.Value ? x : y).Key;
-        decimal maxValue = tempDictionary[maxKey];
+        decimal planeA;
+        decimal planeB;
+        decimal planeC;
+        int maxKey;
+        bool doubleDipRule = false;
+
+
+        maxKey = tempDictionary.Aggregate((x,y)=>x.Value > y.Value ? x : y).Key;
+        planeA = tempDictionary[maxKey];
         tempDictionary.Remove(maxKey);
 
-
-        if (tempDictionary.ContainsValue(maxValue))
+        if (tempDictionary.ContainsValue(planeA))
         {
-            BattleRating = maxValue;
-            RawBattleRating = maxValue;
-            return;   
+            doubleDipRule = true;
         }
 
-        decimal sum = 0;
-        decimal lowerSum = 0;
-        foreach (var plane in tempDictionary)
-        {
-            if (maxValue - plane.Value > 1.1M)
-            {
-                decimal steppedDownValue = maxValue;
-                for (int i = 0; i < 4; i++)
-                {
-                    steppedDownValue = StepDown(steppedDownValue);
-                }
-                lowerSum += steppedDownValue;
-            }
-            else { lowerSum += plane.Value; }
-        }
-        decimal lowerAverage = lowerSum / tempDictionary.Count;
-        sum = lowerAverage + maxValue;
+        maxKey = tempDictionary.Aggregate((x,y)=>x.Value > y.Value ? x : y).Key;
+        planeB = tempDictionary[maxKey];
+        tempDictionary.Remove(maxKey);
+        maxKey = tempDictionary.Aggregate((x,y)=>x.Value > y.Value ? x : y).Key;
+        planeC = tempDictionary[maxKey];
+        tempDictionary.Remove(maxKey);
 
-        RawBattleRating = sum / 2;
-        if (maxValue - RawBattleRating > 0.4M)
-        {
-            BattleRating = StepDown(maxValue);
-            return;
-        }
+        if (planeA - planeB > 2M) planeB = planeA - 2.0M;
+        if (planeA - planeC > 2M) planeC = planeA - 2.0M;
 
-        BattleRating = SanitizeNumber(RawBattleRating);
+        RawBattleRating = (planeA / 2) + (planeB / 4) + (planeC / 4);
 
+        if (doubleDipRule) BattleRating = planeA;
+        else if (RawBattleRating < StepDown(planeA)) BattleRating = StepDown(planeA);
+        else BattleRating = SanitizeNumber(RawBattleRating);
     }
 
     private decimal SanitizeNumber(decimal input)
@@ -125,6 +113,8 @@
 
         throw new Exception("Unexpected result");
     }
+    
+     
     private static decimal StepDown(decimal input)
     {
         if (input < 1.0M) return 1M;
@@ -140,5 +130,5 @@
 
         throw new Exception("Unexpected result");
     }
-
+    
 }
