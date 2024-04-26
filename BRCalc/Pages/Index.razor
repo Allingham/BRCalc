@@ -27,7 +27,8 @@
     public static int planeIndex = 0;
     public decimal BattleRating = 0;
     public decimal RawBattleRating = 0;
-    public decimal debug = 0.0M;
+    public decimal debugNum = 0.0M;
+    public decimal debugNum2 = 0.0M;
 
     public Dictionary<int, decimal> PlaneDictionary = new()
     {
@@ -90,14 +91,26 @@
         planeC = tempDictionary[maxKey];
         tempDictionary.Remove(maxKey);
 
+
         if (planeA - planeB > 2M) planeB = planeA - 2.0M;
         if (planeA - planeC > 2M) planeC = planeA - 2.0M;
 
-        RawBattleRating = (planeA / 2) + (planeB / 4) + (planeC / 4);
+        decimal planeAFraction = planeA / 2;
+        decimal planeBFraction = planeB / 4;
+        decimal planeCFraction = planeC / 4;
+
+        RawBattleRating = planeAFraction + planeBFraction + planeCFraction;
 
         if (doubleDipRule) BattleRating = planeA;
         else if (RawBattleRating < StepDown(planeA)) BattleRating = StepDown(planeA);
-        else BattleRating = SanitizeNumber(RawBattleRating);
+        else
+        {
+            decimal upDelta = planeA - RawBattleRating;
+            decimal downDelta = RawBattleRating - StepDown(planeA);
+
+            if (upDelta <= downDelta) BattleRating = planeA;
+            else BattleRating = StepDown(planeA);
+        }
     }
 
     private decimal SanitizeNumber(decimal input)
