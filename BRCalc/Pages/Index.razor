@@ -72,6 +72,7 @@
 
     private void RemoveSpecifiedPlane(int key)
     {
+        if (PlaneDictionary.Count <= 1) return;
         PlaneDictionary.Remove(key);
         CalculateBR();
     }
